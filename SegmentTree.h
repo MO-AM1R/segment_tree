@@ -13,6 +13,7 @@ using namespace std;
 class SegmentTree {
     int* arr;
     int size;
+    int length;
 
     /**
      * A private method which will build the Tree
@@ -34,6 +35,18 @@ class SegmentTree {
         return arr[index];
     }
 
+    [[nodiscard]] int getSum(int l, int r, int queryLeft, int queryRight, int index){
+        if (l >= queryLeft && r <= queryRight){ // case 1 -> Total overlap
+            return arr[index];
+        }
+        else if (l > queryRight || r < queryLeft){ // case 2 No overlap
+            return 0;
+        }
+
+        int midIndex = (l + r) / 2;
+        return getSum(l, midIndex, queryLeft, queryRight, 2 * index + 1)
+        + getSum(midIndex + 1, r, queryLeft, queryRight, 2 * index + 2) ;
+    }
 public:
     SegmentTree() = default;
 
@@ -44,19 +57,23 @@ public:
      * @param nums represent the array which contains the numbers
      * @param n represent the size of the array
      */
-    explicit SegmentTree(const int nums[], int _size) {
+    explicit SegmentTree(const int nums[], int _size) : length(_size){
         int height = (int)(ceil(log2(_size)));
         size = 2 * (int)pow(2, height) - 1;
-        arr = new int[size];
+        arr = new int[size] {0};
 
-        build(nums, 0, _size - 1, 0);
+        build(nums, 0, length - 1, 0);
+    }
+
+    [[nodiscard]] int getSum(int l, int r){
+        return getSum(0, length - 1, l, r, 0);
     }
 
     friend ostream& operator <<(ostream& os, const SegmentTree& tree) {
         os << "Segment Tree: [";
 
-        for (int i = 0; i < tree.size; ++i) {
-            if (i == tree.size - 1){
+        for (int i = 0; i < tree.length; ++i) {
+            if (i == tree.length - 1){
                 os << tree.arr[i] << "]";
                 break;
             }
