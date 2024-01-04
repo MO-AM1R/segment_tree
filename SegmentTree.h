@@ -11,7 +11,8 @@ using namespace std;
  * @version 1.0
  */
 class SegmentTree {
-    int* arr;
+    int* segmentArray;
+    int* nums;
     int size;
     int length;
 
@@ -22,17 +23,17 @@ class SegmentTree {
      * @param r represent the right of the current interval
      * @param index represent the index of the current node
      */
-    int build(const int nums[], int l, int r, int index){
+    int build(const int& l, const int& r, const int& index){
         if (l == r){
-            arr[index] = nums[l];
-            return arr[index];
+            segmentArray[index] = nums[l];
+            return segmentArray[index];
         }
 
         int midIndex = (r + l) / 2;
-        arr[index] = build(nums, l, midIndex, index * 2 + 1) +
-                build(nums, midIndex + 1, r, index * 2 + 2);
+        segmentArray[index] = build(l, midIndex, index * 2 + 1) +
+                build(midIndex + 1, r, index * 2 + 2);
 
-        return arr[index];
+        return segmentArray[index];
     }
 
     /**
@@ -44,9 +45,9 @@ class SegmentTree {
      * @param index represent the index of the current node
      * @return an integer value represent the sum of the interval
      */
-    [[nodiscard]] int getSum(int l, int r, int queryLeft, int queryRight, int index){
+    [[nodiscard]] int getSum(const int& l, const int& r, const int& queryLeft, const int& queryRight, const int& index){
         if (l >= queryLeft && r <= queryRight){ // case 1 -> Total overlap
-            return arr[index];
+            return segmentArray[index];
         }
         else if (l > queryRight || r < queryLeft){ // case 2 No overlap
             return 0;
@@ -56,22 +57,52 @@ class SegmentTree {
         return getSum(l, midIndex, queryLeft, queryRight, 2 * index + 1)
         + getSum(midIndex + 1, r, queryLeft, queryRight, 2 * index + 2) ;
     }
+
+    /**
+     * A private method its role to update specific value in the array
+     * @param l represent the current left interval
+     * @param r represent the current right interval
+     * @param diff represent the difference between the old and new value
+     * @param index represent the index of the current node
+     * @param position represent the index of the old value
+     */
+    void update(const int& l, const int& r, const int& diff, const int& index, const int& position){
+        if (l > position || r < position){
+            return;
+        }
+
+        segmentArray[index] += diff;
+        if (r != l){
+            int midIndex = (l + r) / 2;
+            update(l, midIndex, diff, 2 * index + 1, position);
+            update(midIndex + 1, r, diff, 2 * index + 1, position);
+        }
+    }
+
 public:
     SegmentTree() = default;
 
     /**
-     * A parameterized constructor that initialize the @property size and arr
+     * A parameterized constructor that initialize the @property size and segmentArray
      *
      * and build the Tree
      * @param nums represent the array which contains the numbers
      * @param n represent the size of the array
+     * @throw invalid_argument exception if the size is invalid
      */
-    explicit SegmentTree(const int nums[], int _size) : length(_size){
+    explicit SegmentTree(const int nums[], const int& _size) : length(_size){
+        if (_size < 0){
+            throw invalid_argument("Invalid size");
+        }
         int height = (int)(ceil(log2(_size)));
         size = 2 * (int)pow(2, height) - 1;
-        arr = new int[size] {0};
+        segmentArray = new int[size] {0};
+        this->nums = new int [length];
 
-        build(nums, 0, length - 1, 0);
+        for (int i = 0; i < _size; ++i) {
+            this->nums[i] = nums[i];
+        }
+        build(0, length - 1, 0);
     }
 
     /**
@@ -80,21 +111,43 @@ public:
      * @param r represent the current right interval
      * @return an integer value represent the sum of the interval
      */
-    [[nodiscard]] int getSum(int l, int r){
+    [[nodiscard]] int getSum(const int& l, const int& r){
         return getSum(0, length - 1, l, r, 0);
     }
 
+    /**
+     * A wrapper function to update specific value in the array
+     * @param nums represent the array which contains the numbers
+     * @param index represent the index which contains the old value
+     * @param newVal represent the new value
+     * @throw out_of_range exception if the index is invalid
+      */
+    void update(const int& index, const int& newVal){
+        if (index >= length || index < 0){
+            throw out_of_range("Invalid index");
+        }
+        int diff = newVal - nums[index];
+        nums[index] = newVal ;
+        update(0, length - 1, diff, index, 0);
+    }
+
+    /**
+     * A friend function its role to print the segment array
+     * @param os
+     * @param tree
+     * @return
+     */
     friend ostream& operator <<(ostream& os, const SegmentTree& tree) {
         os << "Segment Tree: [";
 
         for (int i = 0; i < tree.length; ++i) {
             if (i == tree.length - 1){
-                os << tree.arr[i] << "]";
+                os << tree.segmentArray[i];
                 break;
             }
-            os << tree.arr[i] << ", ";
+            os << tree.segmentArray[i] << ", ";
         }
-
+        os << "]";
         return os;
     }
 
@@ -102,7 +155,7 @@ public:
      * A destructor which will free the tree
      */
     ~SegmentTree(){
-        delete[] arr;
+        delete[] segmentArray;
         size = 0;
     }
 };
