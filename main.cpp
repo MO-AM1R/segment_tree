@@ -1,6 +1,7 @@
 # include "SegmentTree.h"
 
 int main() {
-    cout << "Hello, World!" << std::endl;
+    int arr[] = {1, 3, 4};
+    auto* segmentTree = new SegmentTree(arr, 3);
     return 0;
 }
