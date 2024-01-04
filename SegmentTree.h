@@ -35,6 +35,15 @@ class SegmentTree {
         return arr[index];
     }
 
+    /**
+     * A private method its role to get the sum of specific interval
+     * @param l represent the current left interval
+     * @param r represent the current right interval
+     * @param queryLeft represent the left interval of the target
+     * @param queryRight represent the right interval of the target
+     * @param index represent the index of the current node
+     * @return an integer value represent the sum of the interval
+     */
     [[nodiscard]] int getSum(int l, int r, int queryLeft, int queryRight, int index){
         if (l >= queryLeft && r <= queryRight){ // case 1 -> Total overlap
             return arr[index];
@@ -65,6 +74,12 @@ public:
         build(nums, 0, length - 1, 0);
     }
 
+    /**
+     * A wrapper function to get the sum of specific interval
+     * @param l represent the current left interval
+     * @param r represent the current right interval
+     * @return an integer value represent the sum of the interval
+     */
     [[nodiscard]] int getSum(int l, int r){
         return getSum(0, length - 1, l, r, 0);
     }
