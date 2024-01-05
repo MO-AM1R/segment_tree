@@ -10,7 +10,6 @@ A C++ implementation of a Segment Tree, a data structure used for range queries 
 - [Examples](#examples)
 - [Building and Running](#building-and-running)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
