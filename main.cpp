@@ -1,5 +1,8 @@
 # include "SegmentTree.h"
 
+/**
+ * @brief main function to test program
+ */
 int main() {
     int arr[] = {1, 3, 5, 7, 9, 11};
     SegmentTree segmentTree(arr, 6);

@@ -2,7 +2,6 @@
 # define SEGMENTTREE_SEGMENTTREE_H
 # include <iostream>
 # include <cmath>
-
 using namespace std;
 
 /**
